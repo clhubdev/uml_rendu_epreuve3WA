@@ -1,0 +1,83 @@
+@startuml torapix_diagramme_classe
+
+class Dossier <<entité>> {
+    +<<identifiant>> refDossier int
+    +nomFichierExperise string
+}
+
+class Vehicule<<entité>> {
+    +<<identifiant>> immatriculation string
+    +anneeMiseEnCirculation int
+    +couleur string
+}
+
+class Modele<<entité>> {
+    +<<identifiant>> id
+    +libelle string
+    +marque string
+}
+
+abstract class Prestation<<Abstract>> {
+    +<<identifiant>> id int
+    +ref_dossier: Dossier
+    +libellé string
+    +description string
+    +photo string
+}
+
+
+class PrestationPeinture {
+    +typeOperation: TypePrestationPeinture
+    +carrosserie_peinture: Carrosserie
+}
+
+class PrestationPiece {
+    +quantité int
+    +piece: Piece
+}
+
+enum TypePrestationPeinture<<enum>> {
+    REALISER_VOILE
+    REPARER
+    PEINDRE_PARTIELLEMENT
+    REPARER_PEINDRE_TOTALEMENT
+}
+
+class Piece<<entity>> {
+    +<<identifiant>> refPiece int
+    +libelle
+}
+
+enum Carrosserie<<enum>> {
+    PARE_CHOC_AVANT
+    AILE_AVANT_GAUCHE
+    AILE_AVANT_DROITE
+}
+
+
+' Un dossier d'expertise correspond à un seul véhicule. 
+Dossier "0..1" --* "1" Vehicule
+
+
+' Un modele peut correspondre à aucun véhicule du parc ou plusieurs. 
+Vehicule"0..*" --* "1" Modele
+
+
+' Un dossier peut contenir entre 1 et plusieurs prestations. 
+Prestation "1..*" --* "1" Dossier
+
+
+' Une prestation a deux types. Ces deux types ont une structure similaire mais ont des propriétés supplémentaires propres. Il est donc décidé de faire une classe abstraite Prestation qui reprensente la structure commence et une classe pour chaque type de prestation qui hérite de la classe Prestation. 
+PrestationPeinture --|> Prestation
+PrestationPiece --|> Prestation
+
+
+' Chaque remise en état "peinture" concerne une action. Action qui fait partie de l'énumération TypePrestationPeinture. Action qui concerne une partie de la carrosserie. 
+' Même logique pour la remise en état "pièce"
+PrestationPeinture "0..*" --> "1" TypePrestationPeinture
+PrestationPeinture "0..*" --> "1" Carrosserie
+
+' Sachant qu'une pièce dans le secteur automobile sont de série, on peut considérer qu'une même référence de pièce peuvent faire l'objet d'aucune ou plusieurs prestations de remise en état. Par contre une prestation ne peut concerner qu'une seule pièce. 
+PrestationPiece "0..*" --> "1" Piece
+
+@enduml
